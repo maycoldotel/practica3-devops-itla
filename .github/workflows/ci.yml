@@ -12,7 +12,7 @@ permissions:
   pages: write
   id-token: write
 
-jobs:
+jobs: 
   build-test:
     name: Build y pruebas
     runs-on: ubuntu-latest
