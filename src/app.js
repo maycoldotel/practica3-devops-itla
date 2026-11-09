@@ -47,6 +47,15 @@ function createApp() {
     res.json(tarea);
   });
 
+  app.delete('/api/tareas/:id', (req, res) => {
+    const index = tareas.findIndex(t => t.id === Number(req.params.id));
+    
+    if (index === -1) return res.status(404).json({ error: 'Tarea no encontrada' });
+    
+    tareas.splice(index, 1);
+    res.status(204).send();
+  });
+  
   return app;
 }
 

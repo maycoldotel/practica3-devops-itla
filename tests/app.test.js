@@ -40,3 +40,14 @@ describe('API de tareas', () => {
     expect(r.body.solicitudes).toBeGreaterThanOrEqual(2);
   });
 });
+test('DELETE /api/tareas/:id borra una tarea existente', async () => {
+    await request(app).post('/api/tareas').send({ titulo: 'Tarea para borrar' });
+    
+    const r = await request(app).delete('/api/tareas/1');
+    expect(r.status).toBe(204);
+  });
+
+  test('DELETE de una tarea inexistente devuelve 404', async () => {
+    const r = await request(app).delete('/api/tareas/999');
+    expect(r.status).toBe(404);
+  });

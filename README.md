@@ -54,3 +54,20 @@ docker run -p 3000:3000 tareas-devops
 - Análisis estático real (ESLint) y umbral de cobertura mínima.
 - Monitoreo: usar `/metrics` y los logs JSON; definir al menos una **alerta** (ej. errores > 0).
 - Documentar: guía de instalación, manual de operaciones y lecciones aprendidas.
+
+## Explicación de las Etapas del Pipeline CI/CD
+
+El archivo `.github/workflows/ci.yml` automatiza nuestro flujo de trabajo dividiéndolo en dos trabajos (`jobs`) principales:
+
+### Job 1: `build-test` (Integración Continua - CI)
+1. **checkout@v4:** Clona el código del repositorio en el entorno virtual de GitHub Actions.
+2. **setup-node@v4:** Prepara el entorno con Node.js en su versión 20.
+3. **npm install:** Instala todas las dependencias definidas en el `package.json`.
+4. **Revisión estática (`npm run lint`):** Verifica que los archivos `app.js` y `server.js` no tengan errores de sintaxis básica.
+5. **Pruebas con cobertura (`npm test`):** Ejecuta la suite de Jest para validar que todas las rutas (GET, POST, PATCH, DELETE) funcionen correctamente. Si una prueba falla, el pipeline se detiene aquí (marcando rojo).
+6. **Construir imagen Docker:** Valida que el `Dockerfile` compile correctamente una imagen de la aplicación, etiquetándola con el hash del commit actual.
+
+### Job 2: `deploy-pages` (Despliegue Continuo - CD)
+*Este trabajo solo se ejecuta si el job `build-test` fue exitoso y el evento es un `push` a la rama `main`.*
+1. **configure-pages & upload-pages-artifact:** Prepara el entorno de GitHub Pages y empaqueta el contenido de la carpeta `public/` (donde está nuestro `index.html` estático).
+2. **deploy-pages@v4:** Despliega el artefacto en los servidores de GitHub, haciendo pública la interfaz web en la URL generada.
